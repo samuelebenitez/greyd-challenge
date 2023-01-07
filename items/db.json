@@ -23,10 +23,6 @@
     "name": "country_of_origin",
     "options": [
       {
-        "label": "Seleccionar",
-        "value": null
-      },
-      {
         "label": "Argentina",
         "value": "argentina"
       },

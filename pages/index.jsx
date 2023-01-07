@@ -17,17 +17,20 @@ import {
   ModalBody,
   ModalCloseButton,
   useDisclosure,
+  FormErrorMessage,
 } from "@chakra-ui/react";
 
 import { useRouter } from "next/router";
 
-import { ref, set, push } from "firebase/database";
+import { ref, push } from "firebase/database";
 import { database } from "../firebase.js";
 
 import items from "../items/db.json";
 
 export default function SurveyForm() {
   const [values, setValues] = useState({});
+
+  const [errors, setErrors] = useState(false);
 
   const [loading, setLoading] = useState(false);
 
@@ -37,7 +40,6 @@ export default function SurveyForm() {
 
   function handleChange(e) {
     const { name, value, type, checked } = e.target;
-
     setValues((prevValues) => ({
       ...prevValues,
       [name]: type === "checkbox" ? checked : value,
@@ -46,7 +48,7 @@ export default function SurveyForm() {
 
   function handleSubmit(e) {
     e.preventDefault();
-    console.log(values);
+
     try {
       const formDataRef = ref(database, "form-data");
       push(formDataRef, values);
@@ -81,7 +83,7 @@ export default function SurveyForm() {
               return (
                 <Box my={8} key={key}>
                   <FormLabel color="purple.100" fontSize="lg">
-                    {item.label}*
+                    {item.label} *
                   </FormLabel>
                   <Input
                     onChange={handleChange}
@@ -91,13 +93,16 @@ export default function SurveyForm() {
                     required={item.required}
                     color="white"
                   />
+                  {errors ? (
+                    <FormErrorMessage>This field is required</FormErrorMessage>
+                  ) : null}
                 </Box>
               );
             case "email":
               return (
                 <Box my={8} key={key}>
                   <FormLabel color="purple.100" fontSize="lg">
-                    {item.label}*
+                    {item.label} *
                   </FormLabel>
                   <Input
                     onChange={handleChange}
@@ -113,7 +118,7 @@ export default function SurveyForm() {
               return (
                 <Box my={8} key={key}>
                   <FormLabel color="purple.100" fontSize="lg">
-                    {item.label}*
+                    {item.label} *
                   </FormLabel>
                   <Input
                     onChange={handleChange}
@@ -128,7 +133,7 @@ export default function SurveyForm() {
               return (
                 <Box my={8} key={key}>
                   <FormLabel color="purple.100" fontSize="lg">
-                    {item.label}*
+                    {item.label} *
                   </FormLabel>
                   <Select
                     color="gray.500"
@@ -148,7 +153,7 @@ export default function SurveyForm() {
               return (
                 <Box my={8} key={key}>
                   <FormLabel color="purple.100" fontSize="lg">
-                    {item.label}*
+                    {item.label} *
                   </FormLabel>
                   <Checkbox
                     name={item.name}
