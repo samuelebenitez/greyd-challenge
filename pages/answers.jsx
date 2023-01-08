@@ -1,4 +1,6 @@
 import { useState, useEffect } from "react";
+
+//chakra ui components
 import {
   Button,
   Text,
@@ -11,18 +13,19 @@ import {
 
 import { useRouter } from "next/router";
 
+// to read data from firebase realtime database
 import { ref, onValue } from "firebase/database";
 import { database } from "../firebase.js";
 
-function SurveyAnswers() {
+function Answers() {
   const router = useRouter();
   const [answers, setAnswers] = useState([]);
   const [error, setError] = useState(false);
 
+  //to bring data from firebase
   useEffect(() => {
     try {
       const answersRef = ref(database, "form-data");
-
       onValue(answersRef, (snapshot) => {
         setAnswers(Object.values(snapshot?.val()));
       });
@@ -31,12 +34,9 @@ function SurveyAnswers() {
     }
   }, []);
 
-  console.log(answers);
-
   return (
     <Flex
       align="space-between"
-      justify="space-between"
       direction="column "
       bgGradient={[
         "linear(to-t, blackAlpha.800, blackAlpha.900)",
@@ -121,4 +121,4 @@ function SurveyAnswers() {
   );
 }
 
-export default SurveyAnswers;
+export default Answers;

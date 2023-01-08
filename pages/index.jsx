@@ -1,3 +1,4 @@
+// chakra ui components
 import {
   FormControl,
   FormLabel,
@@ -18,16 +19,19 @@ import {
   Heading,
 } from "@chakra-ui/react";
 
+//react-hook-form
 import { useForm } from "react-hook-form";
 
 import { useRouter } from "next/router";
 
+// to uso firebase
 import { ref, push } from "firebase/database";
 import { database } from "../firebase.js";
 
+//input fields
 import items from "../items/db.json";
 
-export default function SurveyForm() {
+export default function Form() {
   const {
     register,
     handleSubmit,
@@ -35,6 +39,7 @@ export default function SurveyForm() {
     formState: { errors },
   } = useForm();
 
+  //sending data to firebase realtime database and opening modal after
   const onSubmit = (data) => {
     console.log(errors);
     try {
@@ -46,6 +51,7 @@ export default function SurveyForm() {
     }
   };
 
+  //hook to manage modal
   const { isOpen, onOpen, onClose } = useDisclosure();
 
   const router = useRouter();
@@ -64,9 +70,12 @@ export default function SurveyForm() {
       minH="100vh"
       color="white"
     >
+      {/* TITLE */}
       <Heading color="purple.400" fontSize={["3xl", "4xl"]}>
         Greydive challenge
       </Heading>
+
+      {/* FORM */}
 
       <form onSubmit={handleSubmit(onSubmit)}>
         {items.map((item, key) => {
@@ -187,6 +196,9 @@ export default function SurveyForm() {
           }
         })}
       </form>
+
+      {/* MODAL */}
+
       <Modal isOpen={isOpen} onClose={onClose}>
         <ModalOverlay />
         <ModalContent m={4}>
