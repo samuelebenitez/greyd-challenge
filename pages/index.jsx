@@ -1,4 +1,3 @@
-import { useState } from "react";
 import {
   FormControl,
   FormLabel,
@@ -6,8 +5,6 @@ import {
   Select,
   Checkbox,
   Button,
-  Text,
-  Box,
   Flex,
   Modal,
   ModalOverlay,
@@ -18,7 +15,10 @@ import {
   ModalCloseButton,
   useDisclosure,
   FormErrorMessage,
+  Heading,
 } from "@chakra-ui/react";
+
+import { useForm } from "react-hook-form";
 
 import { useRouter } from "next/router";
 
@@ -28,35 +28,27 @@ import { database } from "../firebase.js";
 import items from "../items/db.json";
 
 export default function SurveyForm() {
-  const [values, setValues] = useState({});
+  const {
+    register,
+    handleSubmit,
+    watch,
+    formState: { errors },
+  } = useForm();
 
-  const [errors, setErrors] = useState(false);
-
-  const [loading, setLoading] = useState(false);
-
-  const { isOpen, onOpen, onClose } = useDisclosure();
-
-  const router = useRouter();
-
-  function handleChange(e) {
-    const { name, value, type, checked } = e.target;
-    setValues((prevValues) => ({
-      ...prevValues,
-      [name]: type === "checkbox" ? checked : value,
-    }));
-  }
-
-  function handleSubmit(e) {
-    e.preventDefault();
-
+  const onSubmit = (data) => {
+    console.log(errors);
     try {
       const formDataRef = ref(database, "form-data");
-      push(formDataRef, values);
+      push(formDataRef, data);
       onOpen();
     } catch (error) {
       console.log(error);
     }
-  }
+  };
+
+  const { isOpen, onOpen, onClose } = useDisclosure();
+
+  const router = useRouter();
 
   return (
     <Flex
@@ -67,116 +59,126 @@ export default function SurveyForm() {
         "linear(to-t, blackAlpha.800, blackAlpha.900)",
         "linear(to-b, blackAlpha.800, blackAlpha.900)",
       ]}
-      p={8}
+      p={[4, 8]}
       w="100%"
-      h="100%"
+      minH="100vh"
       color="white"
     >
-      <Text color="purple.400" fontSize="3xl" textTransform="uppercase">
+      <Heading color="purple.400" fontSize={["3xl", "4xl"]}>
         Greydive challenge
-      </Text>
+      </Heading>
 
-      <FormControl w="100%" onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit(onSubmit)}>
         {items.map((item, key) => {
-          switch (item.type) {
+          const { type, label, name, required, options } = item;
+
+          switch (type) {
             case "text":
               return (
-                <Box my={8} key={key}>
-                  <FormLabel color="purple.100" fontSize="lg">
-                    {item.label} *
+                <FormControl isInvalid={errors.full_name} my={8} key={key}>
+                  <FormLabel color="white" fontSize={["md", "lg"]}>
+                    {label}
                   </FormLabel>
                   <Input
-                    onChange={handleChange}
                     type="text"
-                    placeholder="Name"
-                    name={item.name}
-                    required={item.required}
+                    placeholder="Nombre"
+                    name={name}
                     color="white"
+                    {...register(`${name}`, { required: required })}
                   />
-                  {errors ? (
-                    <FormErrorMessage>This field is required</FormErrorMessage>
-                  ) : null}
-                </Box>
+                  {errors.full_name && (
+                    <FormErrorMessage>Este campo es requerido</FormErrorMessage>
+                  )}
+                </FormControl>
               );
             case "email":
               return (
-                <Box my={8} key={key}>
-                  <FormLabel color="purple.100" fontSize="lg">
-                    {item.label} *
+                <FormControl isInvalid={errors.email} my={8} key={key}>
+                  <FormLabel color="white" fontSize={["md", "lg"]}>
+                    {label}
                   </FormLabel>
                   <Input
-                    onChange={handleChange}
                     type="email"
                     placeholder="Email"
-                    name={item.name}
-                    required={item.required}
+                    name={name}
                     color="white"
+                    {...register(`${name}`, { required: required })}
                   />
-                </Box>
+                  {errors.email && (
+                    <FormErrorMessage>Este campo es requerido</FormErrorMessage>
+                  )}
+                </FormControl>
               );
             case "date":
               return (
-                <Box my={8} key={key}>
-                  <FormLabel color="purple.100" fontSize="lg">
-                    {item.label} *
+                <FormControl isInvalid={errors.birth_date} my={8} key={key}>
+                  <FormLabel color="white" fontSize={["md", "lg"]}>
+                    {label}
                   </FormLabel>
                   <Input
-                    onChange={handleChange}
                     type="date"
                     color="white"
-                    name={item.name}
-                    required={item.required}
+                    name={name}
+                    {...register(`${name}`, { required: required })}
                   />
-                </Box>
+                  {errors.birth_date && (
+                    <FormErrorMessage>Este campo es requerido</FormErrorMessage>
+                  )}
+                </FormControl>
               );
             case "select":
               return (
-                <Box my={8} key={key}>
-                  <FormLabel color="purple.100" fontSize="lg">
-                    {item.label} *
+                <FormControl
+                  isInvalid={errors.country_of_origin}
+                  my={8}
+                  key={key}
+                >
+                  <FormLabel color="white" fontSize={["md", "lg"]}>
+                    {label}
                   </FormLabel>
                   <Select
                     color="gray.500"
-                    name={item.name}
-                    required={item.required}
-                    onChange={handleChange}
+                    name={name}
+                    {...register(`${name}`, { required: required })}
                   >
-                    {item.options.map((option, key) => (
+                    {options.map((option, key) => (
                       <option key={key} value={option.value}>
                         {option.label}
                       </option>
                     ))}
                   </Select>
-                </Box>
+                  {errors.country_of_origin && (
+                    <FormErrorMessage>Este campo es requerido</FormErrorMessage>
+                  )}
+                </FormControl>
               );
             case "checkbox":
               return (
-                <Box my={8} key={key}>
-                  <FormLabel color="purple.100" fontSize="lg">
-                    {item.label} *
+                <FormControl
+                  isInvalid={errors.terms_and_conditions}
+                  my={8}
+                  key={key}
+                >
+                  <FormLabel color="white" fontSize={["md", "lg"]}>
+                    {label}
                   </FormLabel>
                   <Checkbox
-                    name={item.name}
-                    required={item.required}
+                    name={name}
                     variant="filled"
                     size="lg"
                     colorScheme="purple"
-                    onChange={handleChange}
+                    {...register(`${name}`, { required: required })}
                   />
-                </Box>
+                  {errors.terms_and_conditions && (
+                    <FormErrorMessage>Este campo es requerido</FormErrorMessage>
+                  )}
+                </FormControl>
               );
             case "submit":
               return (
                 <Flex my={8} key={key}>
-                  <Button
-                    type="submit"
-                    isLoading={loading}
-                    loadingText="Enviando"
-                    onClick={handleSubmit}
-                    colorScheme="purple"
-                    size="lg"
-                  >
-                    {item.label}
+                  <Button type="submit" colorScheme="purple" size="lg">
+                    {label}
                   </Button>
                 </Flex>
               );
@@ -184,7 +186,7 @@ export default function SurveyForm() {
               return null;
           }
         })}
-      </FormControl>
+      </form>
       <Modal isOpen={isOpen} onClose={onClose}>
         <ModalOverlay />
         <ModalContent m={4}>

@@ -1,23 +1,12 @@
 import { useState, useEffect } from "react";
 import {
-  FormControl,
-  FormLabel,
-  Input,
-  Select,
-  Checkbox,
   Button,
   Text,
   Box,
   Flex,
-  Divider,
-  Modal,
-  ModalOverlay,
-  ModalContent,
-  ModalHeader,
-  ModalFooter,
-  ModalBody,
-  ModalCloseButton,
-  useDisclosure,
+  Heading,
+  Grid,
+  GridItem,
 } from "@chakra-ui/react";
 
 import { useRouter } from "next/router";
@@ -26,66 +15,108 @@ import { ref, onValue } from "firebase/database";
 import { database } from "../firebase.js";
 
 function SurveyAnswers() {
+  const router = useRouter();
   const [answers, setAnswers] = useState([]);
+  const [error, setError] = useState(false);
 
   useEffect(() => {
-    const answersRef = ref(database, "form-data");
+    try {
+      const answersRef = ref(database, "form-data");
 
-    const Respuesta = onValue(answersRef, (snapshot) => {
-      setAnswers(Object.values(snapshot.val()));
-    });
+      onValue(answersRef, (snapshot) => {
+        setAnswers(Object.values(snapshot?.val()));
+      });
+    } catch (error) {
+      setError(true);
+    }
   }, []);
 
   console.log(answers);
 
   return (
     <Flex
-      align="center"
-      justify="center"
+      align="space-between"
+      justify="space-between"
       direction="column "
       bgGradient={[
         "linear(to-t, blackAlpha.800, blackAlpha.900)",
         "linear(to-b, blackAlpha.800, blackAlpha.900)",
       ]}
-      p={8}
+      p={[4, 8]}
       w="100%"
-      h="100%"
+      minH="100vh"
       color="white"
     >
-      <Text color="purple.400" fontSize="2xl" my={8} textTransform="uppercase">
-        Respuestas del formulario
-      </Text>
+      <Flex w="100%" justify="space-around" align="center">
+        <Button onClick={() => router.back()} colorScheme="purple">
+          Volver
+        </Button>
+        <Heading color="purple.400" fontSize={["lg", "2xl"]} my={8} mx={4}>
+          Respuestas del formulario
+        </Heading>
+      </Flex>
 
-      {answers.map((answer, key) => (
-        <Box w="100%" key={key}>
-          <Text as="u" color="purple.100" fontSize="lg">
-            Nombre:
-          </Text>
-          <Text color="white" fontSize="lg">
-            {answer.full_name}
-          </Text>
-          <Text as="u" color="purple.100" fontSize="lg">
-            Email:
-          </Text>
-          <Text color="white" fontSize="lg">
-            {answer.email}
-          </Text>
-          <Text as="u" color="purple.100" fontSize="lg">
-            Fecha de nacimiento
-          </Text>
-          <Text color="white" fontSize="lg">
-            {answer.birth_date}
-          </Text>
-          <Text as="u" color="purple.100" fontSize="lg">
-            País de residencia:
-          </Text>
-          <Text color="white" fontSize="lg">
-            {answer.country_of_origin}
-          </Text>
+      <Grid
+        w="100%"
+        templateColumns={["repeat(1, 1fr)", "repeat(2, 1fr)"]}
+        gap={[2, 4]}
+      >
+        {answers.map((answer, key) => (
+          <GridItem key={key} bgColor="gray.600" borderRadius={8} p={[4, 8]}>
+            <Text
+              my={[1, 2]}
+              as="b"
+              color="purple.300"
+              textTransform="uppercase"
+              fontSize={["md", "lg"]}
+            >
+              Nombre:
+            </Text>
 
-          <Divider my={8} />
-        </Box>
-      ))}
+            <Text my={[1, 2]} color="white" fontSize={["sm", "md"]}>
+              {answer.full_name}
+            </Text>
+
+            <Text
+              my={[1, 2]}
+              as="b"
+              color="purple.300"
+              textTransform="uppercase"
+              fontSize={["md", "lg"]}
+            >
+              Email:
+            </Text>
+            <Text my={[1, 2]} color="white" fontSize={["sm", "md"]}>
+              {answer.email}
+            </Text>
+            <Text
+              my={[1, 2]}
+              as="b"
+              color="purple.300"
+              textTransform="uppercase"
+              fontSize={["md", "lg"]}
+            >
+              Fecha de nacimiento
+            </Text>
+            <Text my={[1, 2]} color="white" fontSize={["sm", "md"]}>
+              {answer.birth_date}
+            </Text>
+            <Text
+              my={[1, 2]}
+              as="b"
+              color="purple.300"
+              textTransform="uppercase"
+              fontSize={["md", "lg"]}
+            >
+              País de residencia:
+            </Text>
+            <Text my={[1, 2]} color="white" fontSize={["sm", "md"]}>
+              {answer.country_of_origin}
+            </Text>
+          </GridItem>
+        ))}
+        {error ?? <Heading>AÚN NO HAY RESPUESTAS</Heading>}
+      </Grid>
     </Flex>
   );
 }
