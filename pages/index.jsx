@@ -35,7 +35,6 @@ export default function Form() {
   const {
     register,
     handleSubmit,
-    watch,
     formState: { errors },
   } = useForm();
 
@@ -72,7 +71,7 @@ export default function Form() {
     >
       {/* TITLE */}
       <Heading color="purple.400" fontSize={["3xl", "4xl"]}>
-        Greydive challenge
+        Formulario
       </Heading>
 
       {/* FORM */}

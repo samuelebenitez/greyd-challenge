@@ -1,4 +1,4 @@
-## Greydive challenge
+## Challenge
 
 ## Funcionalidades
 
@@ -9,7 +9,7 @@
 
 ## Descripcion
 
-Pequeña web realizada para un challenge de Greydive
+Pequeña web realizada para un challenge orientada a frontend JR.
 
 ## Librerías usadas
 
